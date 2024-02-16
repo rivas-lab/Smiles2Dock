@@ -78,8 +78,7 @@ def prepare_ligand(
     finally:
         collect()
 
-def convert_pdb_to_pdbqt(input_path, output_path, is_ligand=True):
-    
+def convert_pdb_to_pdbqt(input_path, output_path, is_ligand=True):    
     try:
         if is_ligand:
             logging.info('Converting ligand using OpenBabel.')
