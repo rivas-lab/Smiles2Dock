@@ -1,5 +1,4 @@
 import logging
-import argparse
 
 logging.getLogger("deepchem").setLevel(logging.ERROR)
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s\n', level=logging.INFO)
@@ -15,41 +14,34 @@ from gc import collect
 from psutil import virtual_memory
 import multiprocessing as mp
 from multiprocessing import cpu_count
-from deepchem.dock.pose_generation import VinaPoseGenerator
 
 from src.p2rank_pocket_finder import P2RankPocketFinder
 from src.preparation import prepare_protein, prepare_ligand, convert_pdb_to_pdbqt
 from src.utils import print_block
-
-def parse_args():
-    parser = argparse.ArgumentParser(description="Your script description here")
-    parser.add_argument("ligand_dir", type=str, help="Directory path containing ligands")
-    parser.add_argument("protein_name", type=str, help="Name of the protein")
-    return parser.parse_args()
+from src.vina_pose_generator import VinaPoseGenerator
 
 start_time = time()
 
 logging.info('Number of CPU cores available: ' + str(cpu_count()))
 
-args = parse_args()
-
-ligand_dir = args.ligand_dir
-protein_name = args.protein_name
-
-print_block()
-logging.info("Directory path:")
-logging.info(ligand_dir)
-logging.info("Protein name:")
-logging.info(protein_name)
+# Check command line argument for the directory path
+if len(argv) > 1:
+    directory_path = argv[1]
+    print_block()
+    logging.info("Directory path:")
+    logging.info(directory_path)
+else:
+    logging.info("No file path provided. Please provide a file path as a command line argument.")
+    exit(1)
 
 # Identify the .txt file with CHEMBL IDs
-txt_files = [f for f in os.listdir(ligand_dir) if f.endswith('.txt') and f.startswith('chembl')]
+txt_files = [f for f in os.listdir(directory_path) if f.endswith('.txt') and f.startswith('chembl')]
 
 if txt_files:
-    file_path = os.path.join(ligand_dir, txt_files[0])
+    file_path = os.path.join(directory_path, txt_files[0])
     logging.info('File path:')
     logging.info(file_path)
-    save_path = os.path.join(ligand_dir, 'scores_dict.pkl')
+    save_path = os.path.join(directory_path, 'scores_dict.pkl')
     logging.info('Save path:')
     logging.info(save_path)
 else:
@@ -85,7 +77,6 @@ try:
     print_block()
     logging.info('Preparing protein.')
     protein_pdb_path = directory_path + '/' + protein_name + '.pdb'
-    print(protein_pdb_path)
     p = prepare_protein(protein, protein_pdb_path)
     Chem.rdmolfiles.MolToPDBFile(p, protein_pdb_path)
     #convert_pdb_to_pdbqt(protein_pdb_path, protein_pdb_path, is_ligand=False)
@@ -98,13 +89,12 @@ except Exception as e:
 assert p is not None, 'Preparing the protein failed.'
 
 # PARAMETERS
-num_modes      = 2
-save_interval  = 5
-exhaustiveness = 2
-cpu            = 3
-padding        = 10.0
-threshold      = 0.6
-
+num_modes      = 5
+save_interval  = 5  
+exhaustiveness = 5
+cpu            = 15
+threshold      = 0.3
+padding        = 5.0
 initial_mem = virtual_memory()
 logging.info(f"Initial free memory: {initial_mem.free / (1024**3):.2f} GB")
 
@@ -155,15 +145,15 @@ for i in range(len(ligands)):
                 ligand_mol = m, threshold = threshold, padding = padding)
 
             vpg = VinaPoseGenerator(pocket_finder = pocket_finder)
+            #vpg.precompute_vina_maps(
             
             logging.info('Running docking...')
-            print(protein_pdb_path)
-            print(ligand_sdf_path)
-            complexes, scores = vpg.generate_poses(
+            
+            scores = vpg.generate_poses(
                 molecular_complex=(protein_pdb_path, ligand_sdf_path), 
                 out_dir = directory_path, generate_scores = True, 
                 num_modes = num_modes, cpu = cpu, seed = 123, 
-                exhaustiveness = exhaustiveness)
+                exhaustiveness = exhaustiveness, ligand_name = ligand)
             
             logging.info('Finished docking.')
             
@@ -184,14 +174,6 @@ for i in range(len(ligands)):
             logging.info("An exception of type {} occurred.".format(type(e).__name__))
             output_dic[ids[i]] = 'Error when docking'
         finally:
-            
-            out_pdbqt_docked = os.path.join(directory_path, "%s_docked.pdbqt" % ligand)
-            out_pdbqt        = os.path.join(directory_path, "%s.pdbqt" % ligand)
-            
-            if path.exists(out_pdbqt_docked):
-                remove(out_pdbqt_docked)
-            if path.exists(out_pdbqt):
-                remove(out_pdbqt)
             if path.exists(ligand_pdb_path):
                 remove(ligand_pdb_path)
             if path.exists(ligand_sdf_path):
@@ -207,7 +189,7 @@ for i in range(len(ligands)):
             
             mem = virtual_memory()
             logging.info(f"Free memory out of total: {mem.free / (1024**3):.2f} GB free out of {mem.total / (1024**3):.2f} GB total")
-            
+
         # Save the scores every x iteration
         if (i + 1) % save_interval == 0 or (i + 1) == len(ligands):
             with open(save_path, 'wb') as file:

@@ -1,3 +1,10 @@
 openbabel-openbabel-2-4-0/
 data/
 *.out
+scancel.sh
+src/.ipynb_checkpoints/
+src/__pycache__/
+p2rank_2.4.1/
+.ipynb_checkpoints/
+__pycache__/
+input/

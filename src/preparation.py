@@ -46,7 +46,7 @@ def prepare_protein(
         return p
     
     except Exception as e:
-        logging.info('Failed to prepare the molecule with name: ' + protein)
+        logging.info('Failed to prepare the molecule with name: ' + protein_read_path)
         logging.info("An exception of type {} occurred.".format(type(e).__name__))
         logging.info(e)        
         return None

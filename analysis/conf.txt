@@ -1,0 +1,14 @@
+receptor = ./analysis/slc6a19.pdbqt
+ligand = ./analysis/CHEMBL3431053.pdbqt
+
+center_x = -1.691000
+center_y = -0.021700
+center_z = -6.361600
+
+size_x = 11.748664
+size_y = 11.748664
+size_z = 11.748664
+
+num_modes = 1
+
+exhaustiveness = 1
