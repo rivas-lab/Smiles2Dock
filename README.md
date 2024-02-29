@@ -12,9 +12,17 @@ P2Rank is a powerful tool based on Java for predicting protein-ligand binding po
 
 [Download P2Rank](https://github.com/rdk/p2rank)
 
+### Preparing the PDB File
+
+2. To obtain the PDB file from AlphaFold, go to the AlphaFold website and click on copy link on the PDB file button. Then, navigate to the proteins folder in Sherlock and run:
+```bash
+wget https://alphafold.ebi.ac.uk/entry/O14791 (your file name instead)
+mv {alpha fold name - should start by AF.pdb} {name of your protein.pdb} 
+```
+
 ### Setting Up Environment on Sherlock
 
-2. Before running P2Rank, make sure you have Java loaded in your environment. This is done by the following command:
+3. Before running P2Rank, make sure you have Java loaded in your environment. This is done by the following command:
 
 ```bash
 ml java
@@ -22,18 +30,10 @@ ml java
 
 ### Predicting the Pockets
 
-3. To predict the binding pockets, use the following command:
-4. 
+4. To predict the binding pockets, use the following command:
+
 ```bash
 ./prank predict -f test_data/1fbl.pdb  
-```
-
-### Preparing the PDB File
-
-4. To obtain the PDB file from AlphaFold, go to the AlphaFold website and click on copy link on the PDB file button. Then, navigate to the proteins folder in Sherlock and run:
-```bash
-wget https://alphafold.ebi.ac.uk/entry/O14791 (your file name instead)
-mv {alpha fold name - should start by AF.pdb} {name of your protein.pdb} 
 ```
 
 ### Running the Prediction
