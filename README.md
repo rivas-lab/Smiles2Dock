@@ -1,7 +1,5 @@
 # LLMChemCreator
 
-# LLMChemCreator
-
 ## How to Use P2Rank to Predict Binding Pockets
 
 P2Rank is a powerful tool based on Java for predicting protein-ligand binding pockets. To get started, follow the steps below.
