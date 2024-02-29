@@ -14,7 +14,8 @@ The command to predic the pockets is:
 
 ./prank predict -f test_data/1fbl.pdb  
 
-To get the pdb file, go to the AlphaFold website and click on copy link on the PDB file button. Then, in Sherlock, do:
+To get the pdb file, go to the AlphaFold website and click on copy link on the PDB file button. Then, navigate to the proteins folder in Sherlock and do:
 
 wget https://alphafold.ebi.ac.uk/entry/O14791 (your file name instead)
+mv {alpha fold name - should start by AF.pdb} {name of your protein.pdb} 
 
