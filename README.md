@@ -31,7 +31,7 @@ ml java
 4. To predict the binding pockets, use the following command:
 
 ```bash
-./prank predict -f test_data/1fbl.pdb  
+./prank predict -f ../proteins/{name of your protein}.pdb  
 ```
 
 ### Running the Prediction
