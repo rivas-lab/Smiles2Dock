@@ -36,16 +36,28 @@ ml java
 
 ### Running the Prediction
 
-5. Once you have the PDB file, navigate back to the LLMChemCreator directory. To run the code for one folder of the `chembl_split_dir` (for testing purposes), use:
+5. Once you have the PDB file, navigate back to the LLMChemCreator directory and activate your conda env by doing:
+
+```bash
+conda activate docking
+```
+
+6. To run the code for one folder of the `chembl_split_dir` (for testing purposes), use:
 
 ```bash
 python run.py ./input/chembl_split_dir_1 {name of your protein}
 ```
 
-6. If the test run is successful, execute the full docking process with:
+7. If the test run is successful, execute the full docking process with:
 
 ```bash 
 bash ./run_sherlock.sh {name of your protein}
+```
+
+7. Say your protein is called scn10a. You would do:
+
+```bash 
+bash ./run_sherlock.sh scn10a
 ```
 
 This will spawn 2000 jobs to dock all the ChEMBL ligands against the selected protein.
