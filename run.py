@@ -113,7 +113,7 @@ save_interval  = 5
 exhaustiveness = 2
 cpu            = 3
 padding        = 10.0
-threshold      = 0.6
+threshold      = 0.5
 num_pockets    = 1
 
 initial_mem = virtual_memory()

@@ -8,19 +8,33 @@ from torch import load
 from torch.utils.data import Dataset, DataLoader
 
 class DockingDataset(Dataset):
-    def __init__(self, ligand_embs, protein_embs, scores):
-        self.ligand_embs  = ligand_embs
-        self.protein_embs = protein_embs
-        self.scores       = scores
+    def __init__(self, ligand_emb_paths, protein_emb_paths, scores):
+        """
+        Initializes the dataset with paths to the embeddings and the corresponding scores.
+        :param ligand_emb_paths: A list of paths to the ligand embeddings files.
+        :param protein_emb_paths: A list of paths to the protein embeddings files.
+        :param scores: A list of scores corresponding to each ligand-protein pair.
+        """
+        self.ligand_emb_paths = ligand_emb_paths
+        self.protein_emb_paths = protein_emb_paths
+        self.scores = scores
 
     def __len__(self):
         return len(self.scores)
 
     def __getitem__(self, idx):
+        # Load embeddings from disk
+        ligand_emb = torch.load(self.ligand_emb_paths[idx])
+        protein_emb = torch.load(self.protein_emb_paths[idx])
+        
+        # Ensure that your embeddings are loaded as PyTorch tensors
+        # If not, you would need to convert them here
+
         return {
-            "ligand_emb":  self.ligand_embs[idx],
-            "protein_emb": self.protein_embs[idx],
-            "score":       self.scores[idx]w}
+            "ligand_emb": ligand_emb,
+            "protein_emb": protein_emb,
+            "score": self.scores[idx]
+        }
 
 def get_list_of_proteins(proteins_folder_path):
     
@@ -28,75 +42,60 @@ def get_list_of_proteins(proteins_folder_path):
     proteins = [p[:-4] for p in proteins if p.endswith('.pdb')]
     return proteins
     
-def build_dataset_from_docking_scores_folder(proteins, docking_scores_folder_path
-
-    proteins = os.listdir(proteins_folder_path)
-    proteins = [p[:-4] for p in proteins if p.endswith('.pdb')]
-
+def build_dataset_from_docking_scores_folder(proteins, docking_scores_folder_path):
+                                             
     scores_dicts = []
     
     for protein in proteins:
     
         merged_dict = merge_pickled_dictionaries(docking_scores_folder_path, protein)
         scores_dicts.append(merged_dict)
+        print('Number of scores: ' + str(len(merged_dict)))
         print('Read docking scores for protein: ' + protein)
 
     dfs = []
     
-    for dict in dicts:
+    for dic in scores_dicts:
     
-        if len(dict) == 0:
+        if len(dic) == 0:
             print('Empty')
             dfs.append(pd.DataFrame())
         else:
-            df = pd.DataFrame.from_dict(dict)
-            df = df.T
-            df.columns = ['score1']
-            df = df[df.score1.apply(lambda x: isinstance(x, float))]
-            df.score1 = pd.to_numeric(df.score1)
-            dfs.append(df)
-            print('Done converting to df')
+            try:
+                df = pd.DataFrame.from_dict(dic)
+                df = df.T
+                df.columns = ['score1']
+                df = df[df.score1.apply(lambda x: isinstance(x, float))]
+                df.score1 = pd.to_numeric(df.score1)
+                dfs.append(df)
+                print('Done converting to df')
+            except Exception as e: # Usually happens if a dict only contains errors which are strings
+                print(e)
+                print(dic)
+                print('Error converting dic to df')
+                dfs.append(pd.DataFrame())
             
     for i in range(len(proteins)):
         dfs[i]['protein'] = proteins[i]
 
     dataset_df = pd.concat(dfs)
-
-    dataset_df = dataset_df.set_index('ligands')
     dataset_df = dataset_df.reset_index()
+    dataset_df = dataset_df.rename(columns={'index':'ligand'})
+    
+    mean_score = dataset_df.score1.mean()
+    std_score  = dataset_df.score1.std()
 
     dataset_df = dataset_df.sample(frac = 1)
-    dataset_df['score_category'] = dataset_df['score1'].apply(lambda x: categorize_score_based_on_sigma(x, mean_score, sigma))
+    dataset_df['score_category'] = dataset_df['score1'].apply(lambda x: categorize_score_based_on_sigma(x, mean_score, std_score))
 
-    return dataset
+    return dataset_df
 
-def get_protein_tensors_list(dataset_df, proteins):
+def turn_protein_ligand_columns_to_path_columns(df):
 
-    tensors = {}
-    
-    for protein in proteins:
-        tensors[protein] = load('proteins/embeddings/' + protein + '_embedding.pt')
-
-    proteins_list = dataset_df.protein.tolist()
-    proteins_tensors = [tensors[protein] for protein in proteins_list]
-
-    return proteins_tensors
-
-def get_ligands_tensors_list(dataset_df):
-
-    tensors = {}
-    
-    ligand_tensors = []
-    ligands        = dataset_df.ligands.tolist()
-    
-    for ligand in ligands:
-        tensors[protein] = load('proteins/embeddings/' + protein + '_embedding.pt')
-
-    proteins = dataset_df.protein.tolist()
-    protein_tensors = [tensors[protein] for protein in proteins]
-
-    return protein_tensors
-    
+    df['protein_paths'] = 'proteins/embeddings/' + df.protein + '_embedding.pt'
+    df['ligand_paths']  = 'ligands/' + df.ligand + '.pt'
+    print('Done adding paths...')
+    return df
 
 def categorize_score_based_on_sigma(score, mean, sigma):
     """
