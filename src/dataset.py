@@ -24,8 +24,8 @@ class DockingDataset(Dataset):
 
     def __getitem__(self, idx):
         # Load embeddings from disk
-        ligand_emb = torch.load(self.ligand_emb_paths[idx])
-        protein_emb = torch.load(self.protein_emb_paths[idx])
+        ligand_emb  = load(self.ligand_emb_paths[idx])
+        protein_emb = load(self.protein_emb_paths[idx])
         
         # Ensure that your embeddings are loaded as PyTorch tensors
         # If not, you would need to convert them here
