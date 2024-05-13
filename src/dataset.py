@@ -8,14 +8,17 @@ from torch import load
 from torch.utils.data import Dataset, DataLoader
 
 class DockingDataset(Dataset):
-    def __init__(self, ligand_emb_paths, protein_emb_paths, scores):
+    def __init__(self, ligand_data, protein_emb_paths, scores):
         """
-        Initializes the dataset with paths to the embeddings and the corresponding scores.
-        :param ligand_emb_paths: A list of paths to the ligand embeddings files.
+        Initializes the dataset with ligand embeddings as a PyTorch tensor and names,
+        paths to the protein embeddings, and the corresponding scores.
+        :param ligand_data: A dictionary containing 'combined_tensor' with all ligand embeddings
+                            and 'names' as a list of names corresponding to these embeddings.
         :param protein_emb_paths: A list of paths to the protein embeddings files.
         :param scores: A list of scores corresponding to each ligand-protein pair.
         """
-        self.ligand_emb_paths = ligand_emb_paths
+        self.ligand_embeddings = ligand_data['combined_tensor']
+        self.ligand_names      = ligand_data['names']
         self.protein_emb_paths = protein_emb_paths
         self.scores = scores
 
@@ -23,8 +26,10 @@ class DockingDataset(Dataset):
         return len(self.scores)
 
     def __getitem__(self, idx):
-        # Load embeddings from disk
-        ligand_emb  = load(self.ligand_emb_paths[idx])
+        # Retrieve the ligand embedding directly from the tensor using the index
+        ligand_emb = self.ligand_embeddings[idx]
+
+        # Load protein embedding from disk
         protein_emb = load(self.protein_emb_paths[idx])
         
         # Ensure that your embeddings are loaded as PyTorch tensors
@@ -90,10 +95,9 @@ def build_dataset_from_docking_scores_folder(proteins, docking_scores_folder_pat
 
     return dataset_df
 
-def turn_protein_ligand_columns_to_path_columns(df):
+def turn_protein_column_to_path_columns(df):
 
     df['protein_paths'] = 'proteins/embeddings/' + df.protein + '_embedding.pt'
-    df['ligand_paths']  = 'ligands/' + df.ligand + '.pt'
     print('Done adding paths...')
     return df
 

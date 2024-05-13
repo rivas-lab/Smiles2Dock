@@ -1,6 +1,6 @@
 print('Reading source libraries')
 
-from src.dataset import build_dataset_from_docking_scores_folder, get_list_of_proteins, turn_protein_ligand_columns_to_path_columns, DockingDataset
+from src.dataset import build_dataset_from_docking_scores_folder, get_list_of_proteins, turn_protein_column_to_path_columns, DockingDataset
 from src.model   import DockingModel
 
 print('Reading external libraries')
@@ -12,6 +12,7 @@ from torch.cuda import device_count, get_device_name, is_available
 from torch import stack, tensor, squeeze
 import torch.nn.utils.rnn as rnn_utils
 import torch.nn.functional as F
+from torch import load
 
 if is_available():
     num_gpus = device_count()
@@ -27,18 +28,20 @@ print(train_df.columns)
 val_df   = read_csv('./datasets/smiles2dock_val.csv')
 print('Loaded dataset...')
 
-train_df = turn_protein_ligand_columns_to_path_columns(train_df)
-val_df   = turn_protein_ligand_columns_to_path_columns(val_df)
+ligand_tensor = load('tensors/ligands_tensor.pt')
+
+train_df = turn_protein_column_to_path_columns(train_df)
+val_df   = turn_protein_column_to_path_columns(val_df)
 
 print('Added paths to dfs')
 
 train_dataset = DockingDataset(
-    train_df.ligand_paths.tolist(), 
+    ligand_tensor,
     train_df.protein_paths.tolist(), 
     train_df.score1.tolist())
 
 val_dataset = DockingDataset(
-    val_df.ligand_paths.tolist(), 
+    ligand_tensor,
     val_df.protein_paths.tolist(), 
     val_df.score1.tolist())
 
@@ -48,7 +51,7 @@ model = DockingModel()
 
 def custom_collate_fn(batch):
     # Extracting ligand embeddings, protein embeddings, and scores from the batch
-    ligand_embs = [item['ligand_emb'] for item in batch]
+    ligand_embs  =  [item['ligand_emb'] for item in batch]
     protein_embs = [item['protein_emb'] for item in batch]
     scores = [item['score'] for item in batch]
     
@@ -73,8 +76,8 @@ def custom_collate_fn(batch):
     # Return a dictionary that matches the input structure
     return {'ligand_emb': ligand_embs, 'protein_emb': protein_embs_padded, 'score': scores}
     
-train_loader = DataLoader(train_dataset, batch_size=64, shuffle=False, collate_fn=custom_collate_fn)
-val_loader   = DataLoader(val_dataset, batch_size=64, shuffle=False)
+train_loader = DataLoader(train_dataset, batch_size=64, shuffle=False, collate_fn=custom_collate_fn, num_workers=3)
+val_loader   = DataLoader(val_dataset, batch_size=64, shuffle=False, num_workers=3)
 
 print('Loaded data')
 
