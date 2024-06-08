@@ -5,7 +5,7 @@
 
 ![Biobank Image](https://github.com/rivas-lab/Smiles2Dock/blob/main/images/project_diagram.jpg)
 
-## How to Use P2Rank to Predict Binding Pockets
+## Docking
 
 P2Rank is a powerful tool based on Java for predicting protein-ligand binding pockets. To get started, follow the steps below.
 
@@ -66,4 +66,8 @@ bash ./run_sherlock.sh scn10a
 ```
 
 This will spawn 2000 jobs to dock all the ChEMBL ligands against the selected protein.
+
+## Training
+
+![Biobank Image](https://github.com/rivas-lab/Smiles2Dock/blob/main/images/architecture.png)
 
