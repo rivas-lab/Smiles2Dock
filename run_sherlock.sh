@@ -15,7 +15,8 @@ output_dir="./slurm/${protein_name}"
 # Create the output directory if it doesn't exist
 mkdir -p "${output_dir}"
 
-# Iterate over subdirectories in the input directory
+# Iterate over subdirectories in the input directory in reverse order
+#for sub_dir in $(ls -d ${input_dir}/* | sort -r); do
 for sub_dir in ${input_dir}/*; do
     if [ -d "${sub_dir}" ]; then
         # Extract the name of the sub-directory

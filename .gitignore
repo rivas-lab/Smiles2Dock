@@ -10,10 +10,8 @@ p2rank_2.4.1/
 .ipynb_checkpoints/
 __pycache__/
 input/
-molformer/
-proteins/embeddings/
 slurm/
 old_input_slc6a19/
 huggingface/
 old_imp/
-ligands/
+molformer/checkpoints

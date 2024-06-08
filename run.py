@@ -108,9 +108,9 @@ except Exception as e:
 assert p is not None, 'Preparing the protein failed.'
 
 # PARAMETERS
-num_modes      = 2
+num_modes      = 5
 save_interval  = 5
-exhaustiveness = 2
+exhaustiveness = 8
 cpu            = 3
 padding        = 10.0
 threshold      = 0.5
