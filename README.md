@@ -3,7 +3,7 @@
 ![GitHub](https://img.shields.io/github/license/rivas-lab/Smiles2Dock)
 ![Github](https://img.shields.io/badge/status-under_development-yellow)
 
-![Biobank Image](https://github.com/rivas-lab/Smiles2Dock/raw/main/images/diagram_project.jpg)
+![Biobank Image](https://github.com/rivas-lab/Smiles2Dock/blob/main/images/project_diagram.jpg)
 
 ## How to Use P2Rank to Predict Binding Pockets
 
