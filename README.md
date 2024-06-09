@@ -5,6 +5,35 @@
 
 ![Biobank Image](https://github.com/rivas-lab/Smiles2Dock/blob/main/images/project_diagram.jpg)
 
+## Abstract
+Docking is a crucial component in drug discovery aimed at predicting the binding conformation and affinity between small molecules and target proteins. ML-based docking has recently emerged as a prominent approach, outpacing traditional methods like DOCK and AutoDock Vina in handling the growing scale and complexity of molecular libraries. However, the availability of comprehensive and user-friendly datasets for training and benchmarking ML-based docking algorithms remains limited. We introduce Smiles2Dock, an open large-scale multi-task dataset for molecular docking. We created a framework combining P2Rank and AutoDock Vina to dock 1.7 million ligands from the ChEMBL database against 15 AlphaFold proteins, giving us more than 25 million protein-ligand binding scores. The dataset leverages a wide range of high-accuracy AlphaFold protein models, encompasses a diverse set of biologically relevant compounds and enables researchers to benchmark all major approaches for ML-based docking such as Graph, Transformer and CNN-based methods. We also introduce a novel Transformer-based architecture for docking scores prediction and set it as an initial benchmark for our dataset. Our dataset [here](https://huggingface.co/datasets/tlemenestrel/Smiles2Dock) and code [here](https://github.com/rivas-lab/Smiles2Dock) are publicly available to support the development of novel ML-based methods for molecular docking to advance scientific research in this field.
+
+## Getting Started
+To use this code, clone the repository and ensure you have the required Python packages installed.
+
+### Installation
+
+Clone the repository to your local machine:
+
+```bash
+git clone https://github.com/rivas-lab/Smiles2Dock.git
+```
+Once you have cloned the Smiles2Dock repository, cd into it:
+
+```
+cd Smiles2Dock 
+```
+
+Create your conda environment with
+```
+conda env create -f docking.yml
+```
+
+Then, activate your conda environment with
+```
+conda activate docking
+```
+
 ## Docking
 
 To get started, follow the steps below. The main docking file is called run.py, which docks an input protein (as a .pdb file) with the CHeMBL database. The script is designed to be run on an HPC Slurm cluster.
@@ -17,7 +46,7 @@ To get started, follow the steps below. The main docking file is called run.py, 
 
 ### Preparing the PDB File
 
-2. To obtain the PDB file from AlphaFold, go to the AlphaFold website and click on copy link on the PDB file button. Then, navigate to the proteins folder in Sherlock and run:
+2. To obtain the PDB file from AlphaFold, go to the AlphaFold website and click on copy link on the PDB file button. Then, navigate to the proteins folder and run:
 ```bash
 wget https://alphafold.ebi.ac.uk/entry/O14791 (your file name instead)
 mv {alpha fold name - should start by AF.pdb} {name of your protein.pdb} 
