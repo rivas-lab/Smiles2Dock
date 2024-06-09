@@ -24,12 +24,12 @@ Once you have cloned the Smiles2Dock repository, cd into it:
 cd Smiles2Dock 
 ```
 
-Create your conda environment with
+Create the conda environment for docking with:
 ```
 conda env create -f docking.yml
 ```
 
-Then, activate your conda environment with
+Then, activate your conda environment with:
 ```
 conda activate docking
 ```
@@ -99,4 +99,14 @@ This will spawn 2000 jobs to dock all the ChEMBL ligands against the selected pr
 ## Training
 
 ![Biobank Image](https://github.com/rivas-lab/Smiles2Dock/blob/main/images/architecture.png)
+
+Create the conda environment for training with:
+```
+conda env create -f docking.yml
+```
+
+Then, activate your conda environment with:
+```
+conda activate training
+```
 
