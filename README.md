@@ -110,3 +110,12 @@ Then, activate your conda environment with:
 conda activate training
 ```
 
+To train a given model with a specific architecture, run:
+```
+python train.py --protein_model_dim <PROTEIN_MODEL_DIM> --hidden_dim <HIDDEN_DIM> --ligand_model_dim <LIGAND_MODEL_DIM> --dropout_rate <DROPOUT_RATE>
+```
+
+To evaluate this model on the test set, run:
+```
+python eval.py --protein_model_dim <PROTEIN_MODEL_DIM> --hidden_dim <HIDDEN_DIM> --ligand_model_dim <LIGAND_MODEL_DIM> --dropout_rate <DROPOUT_RATE>
+```
