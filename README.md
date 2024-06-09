@@ -7,7 +7,7 @@
 
 ## Docking
 
-P2Rank is a powerful tool based on Java for predicting protein-ligand binding pockets. To get started, follow the steps below. The main docking file is called run.py, which docks an input protein (as a .pdb file) with the CHeMBL database. The script is designed to be run on an HPC Slurm cluster.
+To get started, follow the steps below. The main docking file is called run.py, which docks an input protein (as a .pdb file) with the CHeMBL database. The script is designed to be run on an HPC Slurm cluster.
 
 ### Installation
 
