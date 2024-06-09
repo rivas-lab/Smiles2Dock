@@ -1,14 +1,19 @@
 import argparse
+
 from src.dataset import build_dataset_from_docking_scores_folder, get_list_of_proteins, turn_protein_column_to_path_columns, DockingDataset
 from src.model import DockingModel, custom_collate_fn
 
+import pytorch_lightning as pl
+import os
+import pandas as pd
+
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
-import os
 from pandas import read_csv
 from torch.utils.data import DataLoader
 from torch.cuda import device_count, get_device_name, is_available
 from torch import load
+from datasets import load_dataset
 
 def compute_rmse(model, val_loader, device):
     model.eval()
@@ -45,8 +50,12 @@ def main(protein_model_dim, hidden_dim, ligand_model_dim, dropout_rate):
         print("CUDA is not available. Using CPU.")
 
     print('Loading dataset...')
-    val_df = read_csv('./datasets/smiles2dock_val.csv')
-    train_df = read_csv('./datasets/smiles2dock_train.csv')
+    # Load the datasets from Hugging Face
+    dataset = load_dataset('tlemenestrel/Smiles2Dock')
+
+    # Convert the splits to pandas DataFrames
+    val_df = pd.DataFrame(dataset['validation'])
+    train_df = pd.DataFrame(dataset['train'])
     print(train_df.columns)
     print('Loaded dataset...')
     checkpoint_filename = f'protein{protein_model_dim}_hidden{hidden_dim}_ligand{ligand_model_dim}_dropout{dropout_rate}_epochepoch=00.ckpt'
