@@ -8,26 +8,32 @@ from torch import load
 from torch.utils.data import Dataset, DataLoader
 
 class DockingDataset(Dataset):
-    def __init__(self, ligand_data, protein_emb_paths, scores):
+    def __init__(self, ligand_data, protein_emb_paths, ligand_ids, scores):
         """
         Initializes the dataset with ligand embeddings as a PyTorch tensor and names,
         paths to the protein embeddings, and the corresponding scores.
         :param ligand_data: A dictionary containing 'combined_tensor' with all ligand embeddings
                             and 'names' as a list of names corresponding to these embeddings.
         :param protein_emb_paths: A list of paths to the protein embeddings files.
+        :param ligand_ids: A list of ligand ids (ChEMBL IDs) corresponding to each ligand-protein pair.
         :param scores: A list of scores corresponding to each ligand-protein pair.
         """
         self.ligand_embeddings = ligand_data['combined_tensor']
-        self.ligand_names      = ligand_data['names']
+        self.ligand_names = ligand_data['names']
         self.protein_emb_paths = protein_emb_paths
+        self.ligand_ids = ligand_ids
         self.scores = scores
+
+        # Create a mapping from ligand names (ChEMBL IDs) to their embeddings
+        self.ligand_name_to_emb = {name: emb for name, emb in zip(self.ligand_names, self.ligand_embeddings)}
 
     def __len__(self):
         return len(self.scores)
 
     def __getitem__(self, idx):
-        # Retrieve the ligand embedding directly from the tensor using the index
-        ligand_emb = self.ligand_embeddings[idx]
+        # Retrieve the ligand embedding by ChEMBL ID
+        ligand_id = self.ligand_ids[idx]
+        ligand_emb = self.ligand_name_to_emb[ligand_id]
 
         # Load protein embedding from disk
         protein_emb = load(self.protein_emb_paths[idx])
