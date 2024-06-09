@@ -18,7 +18,7 @@ from pandas import read_csv
 from torch.utils.data import DataLoader
 from torch.cuda import device_count, get_device_name, is_available
 from torch import load
-
+from datasets import load_dataset
 
 def main(protein_model_dim, hidden_dim, ligand_model_dim, dropout_rate):
     if is_available():
@@ -42,7 +42,8 @@ def main(protein_model_dim, hidden_dim, ligand_model_dim, dropout_rate):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = model.to(device)
 
-    df = read_csv('./datasets/smiles2dock_test.csv')
+    dataset = load_dataset('tlemenestrel/Smiles2Dock')
+    df = pd.DataFrame(dataset['test'])
     print(len(df))
     ligand_tensor = load('tensors/final_tensor.pt')
     ligand_tensor['names'] = [name[:-3] for name in ligand_tensor['names']]
